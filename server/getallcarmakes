@@ -1,0 +1,6 @@
+Command:
+curl.exe -sS "http://127.0.0.1:8000/api/carmakes/" -w "\nHTTP_STATUS:%{http_code}\n"
+
+Output:
+{"count": 2, "makes": [{"id": 2, "name": "Honda", "models": [{"id": 3, "name": "Civic"}]}, {"id": 1, "name": "Toyota", "models": [{"id": 1, "name": "Camry"}, {"id": 2, "name": "Corolla"}]}]}
+HTTP_STATUS:200
