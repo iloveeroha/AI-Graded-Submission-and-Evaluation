@@ -1,0 +1,6 @@
+Command:
+curl.exe -sS "http://127.0.0.1:8000/api/analyze-review/?text=Fantastic%20services" -w "\nHTTP_STATUS:%{http_code}\n"
+
+Output:
+{"text": "Fantastic services", "sentiment": "positive", "score": 1}
+HTTP_STATUS:200
