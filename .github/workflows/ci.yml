@@ -3,6 +3,8 @@ name: CI/CD
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "CI/CD"
   workflow_dispatch:
 
 permissions:
