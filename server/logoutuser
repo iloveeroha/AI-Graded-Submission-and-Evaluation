@@ -1,0 +1,6 @@
+Command (session cookie and CSRF token omitted):
+curl.exe -sS -w "\nHTTP_STATUS:%{http_code}\n" -c cookies.txt -b cookies.txt -X POST http://127.0.0.1:8000/api/logout/ -H "X-CSRFToken: <CSRF token from /api/csrf/>"
+
+Output:
+{"detail": "Logout successful."}
+HTTP_STATUS:200
