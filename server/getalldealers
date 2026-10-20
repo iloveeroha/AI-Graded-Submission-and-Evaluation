@@ -1,0 +1,6 @@
+Command:
+curl.exe -sS "http://127.0.0.1:8000/api/dealers/" -w "\nHTTP_STATUS:%{http_code}\n"
+
+Output:
+{"count": 1, "dealers": [{"id": 1, "name": "Demo Auto Center", "city": "Demo City", "address": "123 Example Street"}]}
+HTTP_STATUS:200
