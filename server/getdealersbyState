@@ -1,0 +1,6 @@
+Command:
+curl.exe -sS "http://127.0.0.1:8000/api/dealers/state/KS/" -w "\nHTTP_STATUS:%{http_code}\n"
+
+Output:
+{"state": "KS", "count": 1, "dealers": [{"id": 2, "name": "Demo Kansas Auto Center", "city": "Wichita", "state": "KS", "address": "123 Example Street"}]}
+HTTP_STATUS:200
