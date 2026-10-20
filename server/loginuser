@@ -1,0 +1,6 @@
+Command (password omitted):
+curl.exe -sS -w "\nHTTP_STATUS:%{http_code}\n" -c cookies.txt -b cookies.txt -X POST http://127.0.0.1:8000/api/login/ -H "X-CSRFToken: <CSRF token from /api/csrf/>" --data-urlencode "username=coursera_demo" --data-urlencode "password=<REDACTED>"
+
+Output:
+{"detail": "Login successful.", "username": "coursera_demo"}
+HTTP_STATUS:200
