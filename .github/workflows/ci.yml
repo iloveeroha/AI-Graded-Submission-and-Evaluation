@@ -1,0 +1,39 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-submissions:
+    name: Validate submission transcripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Show workflow context
+        run: |
+          echo "Workflow: $GITHUB_WORKFLOW"
+          echo "Branch: $GITHUB_REF_NAME"
+          echo "Commit: $GITHUB_SHA"
+
+      - name: Validate car makes transcript
+        run: |
+          test -s server/getallcarmakes
+          grep -q 'HTTP_STATUS:200' server/getallcarmakes
+          echo "PASS: car makes transcript exists and reports HTTP 200"
+
+      - name: Validate review sentiment transcript
+        run: |
+          test -s server/analyzerreview
+          grep -q '"sentiment": "positive"' server/analyzerreview
+          grep -q 'HTTP_STATUS:200' server/analyzerreview
+          echo "PASS: review sentiment transcript reports positive and HTTP 200"
+
+      - name: Complete workflow
+        run: echo "CI/CD workflow completed successfully."
