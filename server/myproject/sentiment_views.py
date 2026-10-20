@@ -39,16 +39,22 @@ def analyze_review(request):
             status=400,
         )
 
+    sentiment, score = analyze_text(text)
+    return JsonResponse(
+        {"text": text, "sentiment": sentiment, "score": score}
+    )
+
+
+@require_GET
+def analyze_path_review(request, review_text):
+    sentiment, _score = analyze_text(review_text)
+    return JsonResponse({"sentiment": sentiment})
+
+
+def analyze_text(text):
     words = re.findall(r"[a-z]+", text.lower())
     score = sum(word in POSITIVE_WORDS for word in words) - sum(
         word in NEGATIVE_WORDS for word in words
     )
     sentiment = "positive" if score > 0 else "negative" if score < 0 else "neutral"
-
-    return JsonResponse(
-        {
-            "text": text,
-            "sentiment": sentiment,
-            "score": score,
-        }
-    )
+    return sentiment, score

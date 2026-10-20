@@ -9,31 +9,58 @@ permissions:
   contents: read
 
 jobs:
-  validate-submissions:
-    name: Validate submission transcripts
+  lint-python-files:
+    name: Lint Python Files
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Show workflow context
-        run: |
-          echo "Workflow: $GITHUB_WORKFLOW"
-          echo "Branch: $GITHUB_REF_NAME"
-          echo "Commit: $GITHUB_SHA"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
 
-      - name: Validate car makes transcript
+      - name: Install Python linter
+        run: python -m pip install flake8
+
+      - name: Lint Python Files
+        run: flake8 server/myproject --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Validate submission transcripts
         run: |
           test -s server/getallcarmakes
           grep -q 'HTTP_STATUS:200' server/getallcarmakes
-          echo "PASS: car makes transcript exists and reports HTTP 200"
-
-      - name: Validate review sentiment transcript
-        run: |
           test -s server/analyzerreview
           grep -q '"sentiment": "positive"' server/analyzerreview
           grep -q 'HTTP_STATUS:200' server/analyzerreview
-          echo "PASS: review sentiment transcript reports positive and HTTP 200"
 
-      - name: Complete workflow
-        run: echo "CI/CD workflow completed successfully."
+      - name: Post Python lint summary
+        if: always()
+        run: echo "Python lint job finished with status ${{ job.status }}."
+
+  lint-javascript-files:
+    name: Lint JavaScript Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: server/frontend/package-lock.json
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+        working-directory: server/frontend
+
+      - name: Lint JavaScript Files
+        run: npm run lint
+        working-directory: server/frontend
+
+      - name: Post JavaScript lint summary
+        if: always()
+        run: echo "JavaScript lint job finished with status ${{ job.status }}."

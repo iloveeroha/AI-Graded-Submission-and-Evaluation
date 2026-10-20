@@ -1,6 +1,6 @@
 Command:
-curl.exe -sS "http://127.0.0.1:8000/api/carmakes/" -w "\nHTTP_STATUS:%{http_code}\n"
+curl.exe -sS "http://127.0.0.1:8000/djangoapp/get_cars" -w "\nHTTP_STATUS:%{http_code}\n"
 
 Output:
-{"count": 2, "makes": [{"id": 2, "name": "Honda", "models": [{"id": 3, "name": "Civic"}]}, {"id": 1, "name": "Toyota", "models": [{"id": 1, "name": "Camry"}, {"id": 2, "name": "Corolla"}]}]}
+{"CarMakes": [{"id": 2, "name": "Honda"}, {"id": 3, "name": "Nissan"}, {"id": 4, "name": "Subaru"}, {"id": 1, "name": "Toyota"}, {"id": 5, "name": "Volkswagen"}], "CarModels": [{"id": 4, "name": "Accord", "make": "Honda", "make_id": 2}, {"id": 5, "name": "CR-V", "make": "Honda", "make_id": 2}, {"id": 3, "name": "Civic", "make": "Honda", "make_id": 2}, {"id": 6, "name": "Altima", "make": "Nissan", "make_id": 3}, {"id": 7, "name": "LEAF", "make": "Nissan", "make_id": 3}, {"id": 8, "name": "Rogue", "make": "Nissan", "make_id": 3}, {"id": 9, "name": "Crosstrek", "make": "Subaru", "make_id": 4}, {"id": 10, "name": "Forester", "make": "Subaru", "make_id": 4}, {"id": 11, "name": "Impreza", "make": "Subaru", "make_id": 4}, {"id": 1, "name": "Camry", "make": "Toyota", "make_id": 1}, {"id": 2, "name": "Corolla", "make": "Toyota", "make_id": 1}, {"id": 12, "name": "Prius", "make": "Toyota", "make_id": 1}, {"id": 13, "name": "Golf", "make": "Volkswagen", "make_id": 5}, {"id": 14, "name": "Jetta", "make": "Volkswagen", "make_id": 5}, {"id": 15, "name": "Tiguan", "make": "Volkswagen", "make_id": 5}]}
 HTTP_STATUS:200

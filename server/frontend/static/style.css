@@ -1,0 +1,19 @@
+.illustration-wrap {
+  gap: 18px;
+}
+
+.car-photo {
+  display: block;
+  width: min(100%, 520px);
+  max-height: 220px;
+  border: 1px solid #e2e8f1;
+  border-radius: 16px;
+  object-fit: cover;
+  box-shadow: 0 14px 40px rgba(30, 55, 90, 0.08);
+}
+
+@media (max-width: 760px) {
+  .car-photo {
+    max-width: 390px;
+  }
+}

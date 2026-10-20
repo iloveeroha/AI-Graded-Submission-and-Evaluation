@@ -63,6 +63,46 @@ class SessionAuthenticationTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
+    def test_coursera_login_accepts_json_and_returns_expected_contract(self):
+        response = self.client.post(
+            "/djangoapp/login/",
+            data=(
+                '{"userName":"%s","password":"StrongTestPassword123!"}'
+                % self.user.username
+            ),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {"status": "Authenticated", "userName": self.user.username},
+        )
+
+    def test_coursera_login_rejects_invalid_json(self):
+        response = self.client.post(
+            "/djangoapp/login/",
+            data="{",
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json(),
+            {"detail": "Request body must be valid JSON."},
+        )
+
+    def test_coursera_logout_returns_empty_username(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get("/djangoapp/logout")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"userName": ""})
+        self.assertNotIn("_auth_user_id", self.client.session)
+
 
 class DealerReviewApiTests(TestCase):
     def test_returns_reviews_for_requested_dealer(self):
@@ -103,8 +143,38 @@ class DealerReviewApiTests(TestCase):
 
         self.assertEqual(response.status_code, 405)
 
+    def test_coursera_reviews_include_expected_fields(self):
+        DealerReview.objects.create(
+            dealer_id=42,
+            reviewer_name="Jordan Lee",
+            rating=5,
+            comment="Helpful staff and a smooth buying experience.",
+            purchase=True,
+            car_make="Toyota",
+            car_model="Camry",
+            sentiment="positive",
+        )
+
+        response = self.client.get("/djangoapp/get_dealer_reviews/42")
+
+        self.assertEqual(response.status_code, 200)
+        review = response.json()["reviews"][0]
+        self.assertEqual(review["name"], "Jordan Lee")
+        self.assertEqual(review["dealership"], 42)
+        self.assertEqual(
+            review["review"],
+            "Helpful staff and a smooth buying experience.",
+        )
+        self.assertTrue(review["purchase"])
+        self.assertEqual(review["car_make"], "Toyota")
+        self.assertEqual(review["car_model"], "Camry")
+        self.assertEqual(review["sentiment"], "positive")
+
 
 class DealerListApiTests(TestCase):
+    def setUp(self):
+        Dealer.objects.all().delete()
+
     def test_returns_all_dealers(self):
         Dealer.objects.create(
             name="Demo Auto Center",
@@ -158,6 +228,35 @@ class DealerDetailApiTests(TestCase):
             },
         )
 
+    def test_coursera_dealer_details_include_all_submission_fields(self):
+        self.dealer.zip = "67202"
+        self.dealer.latitude = 37.6872
+        self.dealer.longitude = -97.3301
+        self.dealer.short_name = "Demo Auto"
+        self.dealer.full_name = "Demo Auto Center of Wichita"
+        self.dealer.save()
+
+        response = self.client.get(
+            f"/djangoapp/get_dealer_details/{self.dealer.id}"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                "id": self.dealer.id,
+                "name": "Demo Auto Center",
+                "city": "Demo City",
+                "state": "",
+                "address": "123 Example Street",
+                "zip": "67202",
+                "latitude": 37.6872,
+                "longitude": -97.3301,
+                "short_name": "Demo Auto",
+                "full_name": "Demo Auto Center of Wichita",
+            },
+        )
+
     def test_unknown_dealer_returns_not_found(self):
         response = self.client.get("/api/dealers/999/")
 
@@ -172,6 +271,7 @@ class DealerDetailApiTests(TestCase):
 
 class DealersByStateApiTests(TestCase):
     def setUp(self):
+        Dealer.objects.all().delete()
         Dealer.objects.create(
             name="Demo Kansas Auto Center",
             city="Wichita",
@@ -213,6 +313,9 @@ class DealersByStateApiTests(TestCase):
 
 
 class CarMakeListApiTests(TestCase):
+    def setUp(self):
+        CarMake.objects.all().delete()
+
     def test_returns_all_makes_with_their_models(self):
         toyota = CarMake.objects.create(name="Toyota")
         CarModel.objects.create(make=toyota, name="Camry")
@@ -254,6 +357,26 @@ class CarMakeListApiTests(TestCase):
 
         self.assertEqual(response.status_code, 405)
 
+    def test_coursera_cars_endpoint_returns_car_models(self):
+        toyota = CarMake.objects.create(name="Toyota")
+        CarModel.objects.create(make=toyota, name="Camry")
+
+        response = self.client.get("/djangoapp/get_cars")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["CarMakes"], [{"id": toyota.id, "name": "Toyota"}])
+        self.assertEqual(
+            response.json()["CarModels"],
+            [
+                {
+                    "id": toyota.models.get().id,
+                    "name": "Camry",
+                    "make": "Toyota",
+                    "make_id": toyota.id,
+                }
+            ],
+        )
+
 
 class ReviewSentimentApiTests(TestCase):
     def test_analyzes_fantastic_services_as_positive(self):
@@ -285,3 +408,11 @@ class ReviewSentimentApiTests(TestCase):
         response = self.client.post("/api/analyze-review/")
 
         self.assertEqual(response.status_code, 405)
+
+    def test_coursera_analyzer_returns_sentiment_for_path_text(self):
+        response = self.client.get(
+            "/djangoapp/analyzer/Fantastic%20services"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"sentiment": "positive"})

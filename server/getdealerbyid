@@ -1,6 +1,6 @@
 Command:
-curl.exe -sS "http://127.0.0.1:8000/api/dealers/1/" -w "\nHTTP_STATUS:%{http_code}\n"
+curl.exe -sS "http://127.0.0.1:8000/djangoapp/get_dealer_details/3" -w "\nHTTP_STATUS:%{http_code}\n"
 
 Output:
-{"id": 1, "name": "Demo Auto Center", "city": "Demo City", "address": "123 Example Street"}
+{"id": 3, "name": "Example Coursera Auto Center", "city": "Wichita", "state": "KS", "address": "100 Learning Way", "zip": "67202", "latitude": 37.6872, "longitude": -97.3301, "short_name": "Example Auto", "full_name": "Example Coursera Auto Center of Wichita"}
 HTTP_STATUS:200

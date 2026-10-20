@@ -8,6 +8,11 @@ class Dealer(models.Model):
     city = models.CharField(max_length=120, blank=True)
     state = models.CharField(max_length=2, blank=True, db_index=True)
     address = models.CharField(max_length=240, blank=True)
+    zip = models.CharField(max_length=10, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    short_name = models.CharField(max_length=160, blank=True)
+    full_name = models.CharField(max_length=240, blank=True)
 
     class Meta:
         ordering = ["name", "id"]
@@ -23,6 +28,11 @@ class DealerReview(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
     comment = models.TextField()
+    purchase = models.BooleanField(default=False)
+    purchase_date = models.DateField(null=True, blank=True)
+    car_make = models.CharField(max_length=100, blank=True)
+    car_model = models.CharField(max_length=100, blank=True)
+    sentiment = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

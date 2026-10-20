@@ -13,11 +13,22 @@ export default function Register() {
 
         <div className="register-heading">
           <p className="register-eyebrow">CREATE YOUR ACCOUNT</p>
-          <h1 id="register-title">Sign up</h1>
+          <h1 id="register-title">Sign-up</h1>
           <p>Join us and start exploring the project.</p>
         </div>
 
         <form className="register-form">
+          <label>
+            Username
+            <input
+              type="text"
+              name="username"
+              autoComplete="username"
+              placeholder="Choose a username"
+              required
+            />
+          </label>
+
           <div className="register-name-row">
             <label>
               First Name
@@ -40,17 +51,6 @@ export default function Register() {
               />
             </label>
           </div>
-
-          <label>
-            Username
-            <input
-              type="text"
-              name="username"
-              autoComplete="username"
-              placeholder="Choose a username"
-              required
-            />
-          </label>
 
           <label>
             Email

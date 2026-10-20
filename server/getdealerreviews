@@ -1,6 +1,6 @@
 Command:
-curl.exe -sS "http://127.0.0.1:8000/api/dealers/1/reviews/" -w "\nHTTP_STATUS:%{http_code}\n"
+curl.exe -sS "http://127.0.0.1:8000/djangoapp/get_dealer_reviews/3" -w "\nHTTP_STATUS:%{http_code}\n"
 
 Output:
-{"dealer_id": 1, "count": 1, "reviews": [{"id": 1, "reviewer_name": "Demo Reviewer", "rating": 5, "comment": "Sample review record used to verify the dealer reviews endpoint.", "created_at": "2026-10-20T22:09:53.732309+00:00"}]}
+{"dealer_id": 3, "count": 1, "reviews": [{"id": 2, "name": "Jordan Lee", "reviewer_name": "Jordan Lee", "dealership": 3, "review": "Helpful staff and a smooth buying experience.", "rating": 5, "comment": "Helpful staff and a smooth buying experience.", "purchase": true, "purchase_date": "2025-01-15", "car_make": "Toyota", "car_model": "Camry", "sentiment": "positive", "created_at": "2026-10-20T23:27:49.277311+00:00"}]}
 HTTP_STATUS:200
