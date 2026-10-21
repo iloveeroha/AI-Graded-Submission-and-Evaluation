@@ -32,6 +32,7 @@ class DealerReview(models.Model):
     purchase_date = models.DateField(null=True, blank=True)
     car_make = models.CharField(max_length=100, blank=True)
     car_model = models.CharField(max_length=100, blank=True)
+    car_year = models.PositiveSmallIntegerField(null=True, blank=True)
     sentiment = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

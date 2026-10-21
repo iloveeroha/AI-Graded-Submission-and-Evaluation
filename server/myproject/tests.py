@@ -150,12 +150,14 @@ class DealerReviewApiTests(TestCase):
             rating=5,
             comment="Helpful staff and a smooth buying experience.",
             purchase=True,
+            purchase_date="2025-01-15",
             car_make="Toyota",
             car_model="Camry",
+            car_year=2025,
             sentiment="positive",
         )
 
-        response = self.client.get("/djangoapp/get_dealer_reviews/42")
+        response = self.client.get("/fetchReviews/dealer/42")
 
         self.assertEqual(response.status_code, 200)
         review = response.json()["reviews"][0]
@@ -168,6 +170,7 @@ class DealerReviewApiTests(TestCase):
         self.assertTrue(review["purchase"])
         self.assertEqual(review["car_make"], "Toyota")
         self.assertEqual(review["car_model"], "Camry")
+        self.assertEqual(review["car_year"], 2025)
         self.assertEqual(review["sentiment"], "positive")
 
 
@@ -198,6 +201,33 @@ class DealerListApiTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"count": 0, "dealers": []})
+
+    def test_fetch_dealers_includes_full_submission_details(self):
+        Dealer.objects.create(
+            name="Example Coursera Auto Center",
+            city="Wichita",
+            state="KS",
+            address="100 Learning Way",
+            zip="67202",
+            latitude=37.6872,
+            longitude=-97.3301,
+            short_name="Example Auto",
+            full_name="Example Coursera Auto Center of Wichita",
+        )
+
+        response = self.client.get("/fetchDealers")
+
+        self.assertEqual(response.status_code, 200)
+        dealer = response.json()["dealers"][0]
+        self.assertEqual(dealer["state"], "KS")
+        self.assertEqual(dealer["zip"], "67202")
+        self.assertEqual(dealer["lat"], 37.6872)
+        self.assertEqual(dealer["lng"], -97.3301)
+        self.assertEqual(dealer["short_name"], "Example Auto")
+        self.assertEqual(
+            dealer["full_name"],
+            "Example Coursera Auto Center of Wichita",
+        )
 
     def test_rejects_non_get_requests(self):
         response = self.client.post("/api/dealers/")
@@ -256,6 +286,22 @@ class DealerDetailApiTests(TestCase):
                 "full_name": "Demo Auto Center of Wichita",
             },
         )
+
+    def test_fetch_dealer_uses_lat_and_lng_fields(self):
+        self.dealer.zip = "67202"
+        self.dealer.latitude = 37.6872
+        self.dealer.longitude = -97.3301
+        self.dealer.short_name = "Demo Auto"
+        self.dealer.full_name = "Demo Auto Center of Wichita"
+        self.dealer.save()
+
+        response = self.client.get(f"/fetchDealer/{self.dealer.id}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["lat"], 37.6872)
+        self.assertEqual(response.json()["lng"], -97.3301)
+        self.assertNotIn("latitude", response.json())
+        self.assertNotIn("longitude", response.json())
 
     def test_unknown_dealer_returns_not_found(self):
         response = self.client.get("/api/dealers/999/")
@@ -411,7 +457,7 @@ class ReviewSentimentApiTests(TestCase):
 
     def test_coursera_analyzer_returns_sentiment_for_path_text(self):
         response = self.client.get(
-            "/djangoapp/analyzer/Fantastic%20services"
+            "/analyze/Fantastic%20services"
         )
 
         self.assertEqual(response.status_code, 200)

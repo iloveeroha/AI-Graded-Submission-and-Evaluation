@@ -5,7 +5,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$url = "http://127.0.0.1:8000/djangoapp/get_dealer_reviews/$DealerId"
+$url = "http://127.0.0.1:8000/fetchReviews/dealer/$DealerId"
 $outputPath = Join-Path $PSScriptRoot "getdealerreviews"
 $curlCommand = 'curl.exe -sS "' + $url + '" -w "\nHTTP_STATUS:%{http_code}\n"'
 $output = (& curl.exe -sS -w "`nHTTP_STATUS:%{http_code}`n" $url 2>&1) -join "`n"

@@ -1,6 +1,11 @@
 from django.urls import path
 
-from myproject import auth_views, car_views, dealer_review_views, sentiment_views
+from myproject import (
+    auth_views,
+    car_views,
+    dealer_review_views,
+    sentiment_views,
+)
 
 
 urlpatterns = [

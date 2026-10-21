@@ -19,6 +19,21 @@ def serialize_dealer(dealer):
     }
 
 
+def serialize_submission_dealer(dealer):
+    return {
+        "id": dealer.id,
+        "name": dealer.name,
+        "city": dealer.city,
+        "state": dealer.state,
+        "address": dealer.address,
+        "zip": dealer.zip,
+        "lat": dealer.latitude,
+        "lng": dealer.longitude,
+        "short_name": dealer.short_name or dealer.name,
+        "full_name": dealer.full_name or dealer.name,
+    }
+
+
 @require_GET
 def all_dealers(request):
     dealers = Dealer.objects.all()
@@ -32,6 +47,20 @@ def all_dealers(request):
                     "city": dealer.city,
                     "address": dealer.address,
                 }
+                for dealer in dealers
+            ],
+        }
+    )
+
+
+@require_GET
+def coursera_all_dealers(request):
+    dealers = Dealer.objects.all()
+    return JsonResponse(
+        {
+            "count": dealers.count(),
+            "dealers": [
+                serialize_submission_dealer(dealer)
                 for dealer in dealers
             ],
         }
@@ -87,6 +116,15 @@ def coursera_dealer_detail(request, dealer_id):
 
 
 @require_GET
+def fetch_dealer_detail(request, dealer_id):
+    try:
+        dealer = Dealer.objects.get(id=dealer_id)
+    except Dealer.DoesNotExist:
+        return JsonResponse({"detail": "Dealer not found."}, status=404)
+    return JsonResponse(serialize_submission_dealer(dealer))
+
+
+@require_GET
 def dealer_reviews(request, dealer_id):
     reviews = DealerReview.objects.filter(dealer_id=dealer_id)
     return JsonResponse(
@@ -131,6 +169,7 @@ def coursera_dealer_reviews(request, dealer_id):
                     ),
                     "car_make": review.car_make,
                     "car_model": review.car_model,
+                    "car_year": review.car_year,
                     "sentiment": review.sentiment,
                     "created_at": review.created_at.isoformat(),
                 }
